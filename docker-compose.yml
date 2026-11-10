@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # 1. Database PostgreSQL Container
+  postgres:
+    image: postgres:15-alpine
+    container_name: kesempatankita_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: kesempatankita
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # 2. Express.js Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kesempatankita_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      DATABASE_URL: "postgresql://postgres:postgrespassword@postgres:5432/kesempatankita?schema=public"
+      CLIENT_ORIGIN: "http://localhost:3000"
+      NODE_ENV: "production"
+    depends_on:
+      - postgres
+
+  # 3. Next.js Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kesempatankita_frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:5000/api/v1"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
