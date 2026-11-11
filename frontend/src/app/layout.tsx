@@ -1,10 +1,13 @@
-// frontend/src/app/layout.tsx
 import type { Metadata } from 'next';
+import Navbar from '@/components/Navbar';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: 'KesempatanKita — Agregator Peluang Karir Mahasiswa',
   description: 'Pusat informasi magang, beasiswa, kompetisi, dan program MBKM terverifikasi untuk mahasiswa Indonesia.',
+  icons: {
+    icon: '/kesempatankita-icon.png',
+  },
 };
 
 export default function RootLayout({
@@ -14,8 +17,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" suppressHydrationWarning>
-      {/* Script ini dijalankan sebelum hydration untuk mencegah flash of wrong theme */}
       <head>
+        {/* Mencegah flash (flicker) warna saat halaman pertama kali di-load */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -25,6 +28,8 @@ export default function RootLayout({
                   var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                   if (saved === 'dark' || (!saved && prefersDark)) {
                     document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
                   }
                 } catch(e) {}
               })();
@@ -32,8 +37,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-slate-50 dark:bg-[#0B0F19] min-h-screen text-slate-900 dark:text-slate-100 antialiased transition-colors duration-200">
-        {children}
+      <body className="bg-slate-50 text-slate-900 dark:bg-[#0B0F19] dark:text-slate-100 antialiased min-h-screen flex flex-col transition-colors duration-200">
+        <Navbar />
+        <main className="flex-1">{children}</main>
       </body>
     </html>
   );

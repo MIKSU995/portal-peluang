@@ -318,11 +318,17 @@ export default function HomePage() {
   };
 
   const handleTabChange = (tab: NavTab) => {
+    setActiveTab(tab);
     if (tab === 'teams') {
       setTeamFinderOppId(undefined);
       setIsTeamFinderOpen(true);
-    } else {
-      setActiveTab(tab);
+    }
+  };
+
+  const handleCloseTeamFinder = () => {
+    setIsTeamFinderOpen(false);
+    if (activeTab === 'teams') {
+      setActiveTab('explore');
     }
   };
 
@@ -335,10 +341,10 @@ export default function HomePage() {
         isBookmarkView={filters.onlyBookmarked}
         onBookmarkClick={() => setFilters((p) => ({ ...p, onlyBookmarked: !p.onlyBookmarked }))}
         notifications={notifications}
-        onMarkRead={(id) => setNotifications((p) => p.map((n) => (n.id === id ? { ...n, isRead: true } : n)))}
+        onMarkRead={(id: string) => setNotifications((p) => p.map((n) => (n.id === id ? { ...n, isRead: true } : n)))}
         onMarkAllRead={() => setNotifications((p) => p.map((n) => ({ ...n, isRead: true })))}
         onClearNotifications={() => setNotifications([])}
-        onNavigateNotification={(id) => {
+        onNavigateNotification={(id: string) => {
           const opp = opportunities.find((o) => o.id === id);
           if (opp) setSelectedOpp(opp);
         }}
@@ -365,7 +371,7 @@ export default function HomePage() {
               Setiap kesempatan adalah langkah menuju masa depan yang lebih besar. Mulai perjalananmu bersama KesempatanKita
             </h1>
 
-            <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed mb-6 font-medium">
+            <p className="text-xs sm:text-sm text-[#c4d7ff] leading-relaxed mb-6 font-medium">
               Waktunya Berkembang, Saatnya Meraih Peluang!
             </p>
 
@@ -416,7 +422,15 @@ export default function HomePage() {
           />
         </div>
 
-        {activeTab === 'explore' ? (
+        {activeTab === 'tracker' ? (
+          <ApplicationTracker
+            opportunities={opportunitiesWithScores}
+            applications={userApplications}
+            onUpdateStatus={handleUpdateAppStatus}
+            onRemoveTrack={handleRemoveTrack}
+            onOpenDetails={setSelectedOpp}
+          />
+        ) : (
           <>
             <SearchAndFilter
               filters={filters}
@@ -439,14 +453,6 @@ export default function HomePage() {
               ))}
             </div>
           </>
-        ) : (
-          <ApplicationTracker
-            opportunities={opportunitiesWithScores}
-            applications={userApplications}
-            onUpdateStatus={handleUpdateAppStatus}
-            onRemoveTrack={handleRemoveTrack}
-            onOpenDetails={setSelectedOpp}
-          />
         )}
       </main>
 
@@ -464,7 +470,7 @@ export default function HomePage() {
 
       <TeamFinderModal
         isOpen={isTeamFinderOpen}
-        onClose={() => setIsTeamFinderOpen(false)}
+        onClose={handleCloseTeamFinder}
         opportunities={opportunities}
         initialOppId={teamFinderOppId}
       />
